@@ -1,103 +1,262 @@
 import Image from "next/image";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { VERDICT_MEANING, VerdictBadge } from "@/components/pich/verdict";
+import { Workflow } from "@/components/pich/workflow";
+import type { Verdict } from "@/lib/engine";
+import proof from "../../proof/proof-result.json";
+
+const GITHUB_URL = "https://github.com/CryptoZephyr/Pich";
+
+const NAV = [
+  { href: "#try", label: "Product" },
+  { href: "#how", label: "How it works" },
+  { href: "#proof", label: "Proof" },
+  { href: "#faq", label: "FAQ" },
+];
+
+const STEPS = [
+  { title: "Advisory", body: "Pick a supported Next.js advisory or paste the text of a new one." },
+  {
+    title: "SERV-compiled checklist",
+    body: "SERV Reasoning reads the advisory and lists the exact versions and conditions that make an app affected, each with a word-for-word quote.",
+  },
+  {
+    title: "Deterministic checks",
+    body: "Pich throws out any condition whose quote is not in the advisory, then checks each client app's files. No AI decides the verdict.",
+  },
+  {
+    title: "Evidence-backed verdict",
+    body: "Each app gets one of three verdicts with file-and-line evidence, the unknowns, and a plain-English note for the client.",
+  },
+];
+
+const VERDICTS: Verdict[] = ["confirmed", "absent_within_inspected_scope", "needs_manual_review"];
+
+const FAQ = [
+  {
+    q: "What does Pich check?",
+    a: "The installed next version from the lockfile, whether the app uses the App or Pages Router, whether middleware or proxy exists and gates auth, the declared hosting platform, Turbopack build flags, and i18n locale config. It only checks what the advisory says matters.",
+  },
+  {
+    q: "Does Pich run my repository's code?",
+    a: "No. The hosted app only reads files from 8 bundled demo client apps. The before/after proof below was run on our own machine against two of those bundled apps, never against a public repository.",
+  },
+  {
+    q: "What does “Absent within inspected scope” mean?",
+    a: "At least one condition the advisory requires was not found in the files Pich inspected. It does not mean the app is safe, and it is not a reason to skip upgrading.",
+  },
+  {
+    q: "Why is SERV Reasoning required?",
+    a: "SERV is what turns advisory prose into a checklist Pich can run. Without it, Pich could only handle advisories someone had hand-coded in advance, and pasting a new advisory would do nothing.",
+  },
+  {
+    q: "Which advisories and frameworks are supported?",
+    a: "Next.js apps with an npm lockfile. Two advisories are bundled: CVE-2025-29927 (with a runtime proof) and GHSA-6gpp-xcg3-4w24 (static checks only). Pasted advisories work when their conditions fit Pich's 8 checks; anything else is shown as needing a person.",
+  },
+  {
+    q: "Is Pich production-ready?",
+    a: "No. This is a hackathon build that checks bundled demo apps. Connecting real client repositories is the next step, and it is not built yet.",
+  },
+];
+
+function Logo({ size }: { size: number }) {
+  return (
+    <Image
+      src="/pich-logo.png"
+      alt="Pich logo"
+      width={size}
+      height={Math.round((size * 1536) / 1519)}
+      className="rounded border-2 shadow-sm"
+      priority
+    />
+  );
+}
+
+function Section({ id, eyebrow, title, children }: { id: string; eyebrow: string; title: string; children: React.ReactNode }) {
+  return (
+    <section id={id} className="scroll-mt-20 border-t-2 py-16">
+      <div className="mx-auto max-w-5xl px-5">
+        <p className="font-head text-sm uppercase tracking-widest text-primary">{eyebrow}</p>
+        <h2 className="mt-2 text-3xl md:text-4xl">{title}</h2>
+        <div className="mt-8">{children}</div>
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
+  const [affected, fixed] = proof.results;
   return (
-    <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="font-mono list-inside list-decimal text-sm/6 text-center sm:text-left">
-          <li className="mb-2 tracking-[-.01em]">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] font-mono font-semibold px-1 py-0.5 rounded">
-              src/app/page.tsx
-            </code>
-            .
-          </li>
-          <li className="tracking-[-.01em]">
-            Save and see your changes instantly.
-          </li>
-        </ol>
+    <>
+      <header className="sticky top-0 z-10 border-b-2 bg-background">
+        <nav className="mx-auto flex max-w-5xl items-center justify-between gap-4 px-5 py-3">
+          <a href="#top" className="flex items-center gap-3">
+            <Logo size={40} />
+            <span className="font-head text-xl">Pich</span>
+          </a>
+          <ul className="hidden items-center gap-6 text-sm font-medium md:flex">
+            {NAV.map((n) => (
+              <li key={n.href}>
+                <a href={n.href} className="hover:underline">
+                  {n.label}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href={GITHUB_URL} className="hover:underline">
+                GitHub
+              </a>
+            </li>
+          </ul>
+          <a
+            href="#try"
+            className="rounded border-2 bg-primary px-4 py-1.5 font-head text-sm text-primary-foreground shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            Try it
+          </a>
+        </nav>
+      </header>
 
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 w-full sm:w-auto md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
-        </div>
+      <main id="top">
+        <section className="mx-auto max-w-5xl px-5 py-16 md:py-24">
+          <p className="inline-block rounded border-2 bg-accent px-3 py-1 font-head text-xs uppercase tracking-widest shadow-sm">
+            For agencies running 10–40 client Next.js apps
+          </p>
+          <h1 className="mt-6 max-w-3xl text-4xl leading-tight md:text-6xl">A new advisory flags every client. Which ones are actually affected?</h1>
+          <p className="mt-6 max-w-2xl text-lg">
+            Version scanners flag every app on an affected version. Pich reads the advisory with SERV Reasoning, then checks each client app for the
+            advisory&apos;s exact conditions and shows you the lines of code behind every verdict.
+          </p>
+          <div className="mt-8 flex flex-wrap gap-4">
+            <a
+              href="#try"
+              className="rounded border-2 bg-primary px-6 py-3 font-head text-primary-foreground shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
+            >
+              Check 8 demo client apps
+            </a>
+            <a href="#proof" className="rounded border-2 bg-card px-6 py-3 font-head shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">
+              See the runtime proof
+            </a>
+          </div>
+        </section>
+
+        <Section id="how" eyebrow="How Pich works" title="From advisory to evidence in four steps">
+          <ol className="grid gap-4 md:grid-cols-4">
+            {STEPS.map((s, i) => (
+              <li key={s.title} className="rounded border-2 bg-card p-4 shadow-md">
+                <span className="flex size-8 items-center justify-center rounded border-2 bg-primary font-head text-sm text-primary-foreground">
+                  {i + 1}
+                </span>
+                <h3 className="mt-3 text-lg">{s.title}</h3>
+                <p className="mt-2 text-sm">{s.body}</p>
+              </li>
+            ))}
+          </ol>
+        </Section>
+
+        <Section id="try" eyebrow="Product" title="Run Pich on 8 demo client apps">
+          <p className="mb-8 max-w-2xl">
+            These are 8 small Next.js apps bundled with Pich, each set up like a real agency client: different versions, hosting, middleware, and build
+            settings.
+          </p>
+          <Workflow />
+        </Section>
+
+        <Section id="verdicts" eyebrow="Three verdicts" title="Every app gets exactly one, with evidence">
+          <ul className="grid gap-4 md:grid-cols-3">
+            {VERDICTS.map((v) => (
+              <li key={v} className="rounded border-2 bg-card p-4 shadow-md">
+                <VerdictBadge verdict={v} />
+                <p className="mt-3 text-sm">{VERDICT_MEANING[v]}</p>
+              </li>
+            ))}
+          </ul>
+          <p className="mt-6 text-sm text-muted-foreground">
+            Pich never calls an app “safe”. Its verdicts only describe the files it inspected.
+          </p>
+        </Section>
+
+        <Section id="proof" eyebrow="Product proof" title="The conditions matter: a controlled before/after run">
+          <p className="max-w-2xl">
+            Static checks say where an advisory&apos;s conditions exist. To show those conditions are real, we built and ran two of the bundled apps
+            locally with the real Next.js releases, then sent the {proof.cve} bypass header to their protected <code className="font-mono">{proof.path}</code>{" "}
+            page.
+          </p>
+          <div className="mt-6 overflow-x-auto rounded border-2 bg-card shadow-md">
+            <table className="w-full text-left text-sm">
+              <thead className="border-b-2 bg-muted font-head">
+                <tr>
+                  <th className="p-3">Demo client app</th>
+                  <th className="p-3">next version</th>
+                  <th className="p-3">Normal request</th>
+                  <th className="p-3">With bypass header</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className="border-b-2">
+                  <td className="p-3">Acme Dental (affected)</td>
+                  <td className="p-3 font-mono">{affected.next}</td>
+                  <td className="p-3 font-mono">{affected.noHeader} redirect to login</td>
+                  <td className="bg-confirmed-soft p-3 font-mono font-bold">{affected.withHeader} admin page served</td>
+                </tr>
+                <tr>
+                  <td className="p-3">Brightline Legal (fixed)</td>
+                  <td className="p-3 font-mono">{fixed.next}</td>
+                  <td className="p-3 font-mono">{fixed.noHeader} redirect to login</td>
+                  <td className="bg-absent-soft p-3 font-mono font-bold">{fixed.withHeader} redirect to login</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="mt-4 text-sm text-muted-foreground">
+            Header sent: <code className="font-mono">{proof.header}</code>. Run on {proof.ranAt.slice(0, 10)} with{" "}
+            <a href={`${GITHUB_URL}/blob/main/proof/run-proof.mjs`} className="underline">
+              proof/run-proof.mjs
+            </a>
+            . This runtime proof exists only for {proof.cve}; the second advisory is checked statically.
+          </p>
+        </Section>
+
+        <Section id="faq" eyebrow="FAQ" title="Questions agencies and judges ask">
+          <Accordion>
+            {FAQ.map((f) => (
+              <AccordionItem key={f.q} value={f.q}>
+                <AccordionTrigger>{f.q}</AccordionTrigger>
+                <AccordionContent>
+                  <p className="text-foreground">{f.a}</p>
+                </AccordionContent>
+              </AccordionItem>
+            ))}
+          </Accordion>
+        </Section>
       </main>
-      <footer className="row-start-3 flex gap-[24px] flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
+
+      <footer className="border-t-2 bg-secondary text-secondary-foreground">
+        <div className="mx-auto grid max-w-5xl gap-8 px-5 py-12 md:grid-cols-[auto_1fr_auto]">
+          <Logo size={96} />
+          <div>
+            <p className="font-head text-xl">Pich</p>
+            <p className="mt-2 max-w-md text-sm">
+              Advisory triage for agencies running many Next.js client apps. SERV Reasoning compiles the advisory; deterministic checks decide the verdict.
+            </p>
+            <p className="mt-4 inline-block rounded border-2 border-secondary-foreground px-2 py-0.5 text-xs font-medium">MIT Licensed</p>
+          </div>
+          <ul className="space-y-2 text-sm">
+            {NAV.map((n) => (
+              <li key={n.href}>
+                <a href={n.href} className="hover:underline">
+                  {n.label}
+                </a>
+              </li>
+            ))}
+            <li>
+              <a href={GITHUB_URL} className="hover:underline">
+                GitHub
+              </a>
+            </li>
+          </ul>
+        </div>
       </footer>
-    </div>
+    </>
   );
 }

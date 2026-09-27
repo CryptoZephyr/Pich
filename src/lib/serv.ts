@@ -121,7 +121,7 @@ const EXPLAIN_SYSTEM = `You write short, auditable security notes from a softwar
 - Never say or imply the app is "safe", "secure", "not vulnerable", or "exploited". "Absent within inspected scope" means the specific advisory conditions were not found in the files inspected.
 - "Confirmed" means the advisory's conditions are present in the code and config; it does not mean an attack happened.
 - Evidence bullets must cite file names (and line numbers when given) from the JSON. Do not invent files, versions, or facts.
-- List every unknown and caveat from the JSON.
+- List every unknown from the JSON. Items in "caveats" are optional workarounds the inspector did not check; mention them only as optional hardening, never as extra conditions or requirements.
 - recommended_action: concrete next step (e.g. upgrade to a fixed version from the checklist, or what information is needed for manual review).
 - Plain English a non-technical client can read. Under 140 words total.`;
 
