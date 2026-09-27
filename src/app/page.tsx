@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { VERDICT_MEANING, VerdictBadge } from "@/components/pich/verdict";
 import { Workflow } from "@/components/pich/workflow";
@@ -109,12 +110,17 @@ export default function Home() {
               </a>
             </li>
           </ul>
+          <div className="flex items-center gap-4">
+          <Link href="/docs" className="text-sm font-medium hover:underline md:hidden">
+            Docs
+          </Link>
           <a
             href="#try"
             className="rounded border-2 bg-primary px-4 py-1.5 font-head text-sm text-primary-foreground shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
           >
             Try it
           </a>
+          </div>
         </nav>
       </header>
 
@@ -183,7 +189,7 @@ export default function Home() {
             page.
           </p>
           <div className="mt-6 overflow-x-auto rounded border-2 bg-card shadow-md">
-            <table className="w-full text-left text-sm">
+            <table className="w-full min-w-[34rem] text-left text-sm">
               <thead className="border-b-2 bg-muted font-head">
                 <tr>
                   <th className="p-3">Demo client app</th>
@@ -209,7 +215,7 @@ export default function Home() {
             </table>
           </div>
           <p className="mt-4 text-sm text-muted-foreground">
-            Header sent: <code className="font-mono">{proof.header}</code>. Run on {proof.ranAt.slice(0, 10)} with{" "}
+            Header sent: <code className="break-all font-mono">{proof.header}</code>. Run on {proof.ranAt.slice(0, 10)} with{" "}
             <a href={`${GITHUB_URL}/blob/main/proof/run-proof.mjs`} className="underline">
               proof/run-proof.mjs
             </a>
