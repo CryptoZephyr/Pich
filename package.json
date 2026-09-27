@@ -3,25 +3,35 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "bundle-fixtures": "node scripts/bundle-fixtures.mjs",
+    "predev": "node scripts/bundle-fixtures.mjs",
     "dev": "next dev",
+    "prebuild": "node scripts/bundle-fixtures.mjs",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "node scripts/bundle-fixtures.mjs && tsc --noEmit",
+    "test": "node scripts/bundle-fixtures.mjs && tsx scripts/verify-engine.ts",
+    "test:serv": "node scripts/bundle-fixtures.mjs && tsx scripts/verify-serv.ts"
   },
   "dependencies": {
+    "next": "15.5.25",
+    "openai": "5.23.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "next": "15.5.4"
+    "semver": "7.7.2"
   },
   "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "15.5.4",
-    "@eslint/eslintrc": "^3"
+    "@eslint/eslintrc": "3",
+    "@tailwindcss/postcss": "4",
+    "@types/node": "20",
+    "@types/react": "19",
+    "@types/react-dom": "19",
+    "@types/semver": "7.7.1",
+    "eslint": "9",
+    "eslint-config-next": "15.5.25",
+    "tailwindcss": "4",
+    "tsx": "4.20.6",
+    "typescript": "5"
   }
 }

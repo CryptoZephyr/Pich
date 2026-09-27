@@ -1,0 +1,24 @@
+{
+  "advisory": "GHSA-f82v-jwr5-mffw",
+  "cve": "CVE-2025-29927",
+  "header": "x-middleware-subrequest: middleware:middleware:middleware:middleware:middleware",
+  "path": "/admin",
+  "ranAt": "2026-09-27T21:05:05.417Z",
+  "results": [
+    {
+      "client": "client-a",
+      "next": "14.2.24",
+      "noHeader": 307,
+      "withHeader": 200,
+      "expectBypass": 200
+    },
+    {
+      "client": "client-b",
+      "next": "14.2.25",
+      "noHeader": 307,
+      "withHeader": 307,
+      "expectBypass": 307
+    }
+  ],
+  "pass": true
+}

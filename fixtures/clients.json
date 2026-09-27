@@ -1,0 +1,34 @@
+[
+  {
+    "id": "client-a",
+    "name": "Acme Dental"
+  },
+  {
+    "id": "client-b",
+    "name": "Brightline Legal"
+  },
+  {
+    "id": "client-c",
+    "name": "Cobalt Coffee"
+  },
+  {
+    "id": "client-d",
+    "name": "Dune Outfitters"
+  },
+  {
+    "id": "client-e",
+    "name": "Evergreen Clinic"
+  },
+  {
+    "id": "client-f",
+    "name": "Fjord Studio"
+  },
+  {
+    "id": "client-g",
+    "name": "Granite Realty"
+  },
+  {
+    "id": "client-h",
+    "name": "Harbor Bikes"
+  }
+]
