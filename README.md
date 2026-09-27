@@ -58,7 +58,7 @@ Without SERV, Pich can only handle advisories someone hand-coded in advance, whi
 ## Try it (under 2 minutes)
 
 1. Open https://pich-dev.vercel.app and click **Check an advisory**.
-2. Keep **CVE-2025-29927** and **8 demo client apps**, then click **Check the 8 demo apps**. SERV takes about 20 seconds.
+2. Keep **CVE-2025-29927** and **8 demo client apps**, then click **Check the 8 demo apps**. SERV usually takes 20–45 seconds.
 3. Open **Acme Dental** (Confirmed) to see the evidence, then click **Write client note**.
 4. Switch to **My public GitHub repo** and paste any public Next.js repo link.
 

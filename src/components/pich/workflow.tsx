@@ -14,7 +14,7 @@ type Compiled = { checklist: Checklist; rejected: RejectedItem[]; meta: ServMeta
 type NoteState = { status: "loading" } | { status: "error"; message: string } | { status: "done"; note: ClientNote; meta: ServMeta };
 
 const CUSTOM = "custom";
-const EXAMPLE_REPO = "https://github.com/CryptoZephyr/Pich/tree/devin/1790543127-pich-serv-core/fixtures/client-a";
+const EXAMPLE_REPO = "https://github.com/CryptoZephyr/Pich/tree/main/fixtures/client-a";
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -348,7 +348,7 @@ export function Workflow() {
         </div>
         {phase === "compiling" && (
           <p className="text-sm" role="status">
-            SERV Reasoning is turning the advisory into a checklist. This usually takes 15–30 seconds.
+            SERV Reasoning is turning the advisory into a checklist. This usually takes 20–45 seconds.
           </p>
         )}
         {phase === "error" && (

@@ -94,7 +94,7 @@ export const startPages: Record<string, React.ReactNode> = {
         <li>
           Under <strong>2 Choose which apps to check</strong>, keep <strong>8 demo client apps</strong> and press <strong>Check the 8 demo apps</strong>.
         </li>
-        <li>Wait while SERV reads the advisory. This usually takes 15 to 40 seconds.</li>
+        <li>Wait while SERV reads the advisory. This usually takes 20 to 45 seconds.</li>
         <li>
           Read <strong>3 What SERV read from the advisory</strong>. Each item shows the quote it came from.
         </li>

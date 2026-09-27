@@ -280,7 +280,7 @@ export function evaluate(checklist: Checklist, client: { id: string; name: strin
   let reason: string;
   if (notMet.length > 0) {
     verdict = "absent_within_inspected_scope";
-    reason = `Condition not met: ${notMet.map((c) => c.note).join("; ")}. This is not a statement that the app is safe.`;
+    reason = `Condition not met: ${[...new Set(notMet.map((c) => c.note))].join("; ")}. This is not a statement that the app is safe.`;
   } else if (unknowns.length > 0) {
     verdict = "needs_manual_review";
     reason = `No condition is contradicted, but ${unknowns.length} could not be determined.`;

@@ -108,7 +108,7 @@ export const usingPages: Record<string, React.ReactNode> = {
     <>
       <UL>
         <li>
-          <strong>SERV is slow</strong>: compiling usually takes 15 to 40 seconds. The server allows up to 120 seconds.
+          <strong>SERV is slow</strong>: compiling usually takes 20 to 45 seconds. The server allows up to 120 seconds.
         </li>
         <li>
           <strong>Rate limited</strong>: wait one minute and try again.
