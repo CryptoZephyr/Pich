@@ -39,7 +39,7 @@ const FAQ = [
   },
   {
     q: "Does Pich run my repository's code?",
-    a: "No. The hosted app only reads files from 8 bundled demo client apps. The before/after proof below was run on our own machine against two of those bundled apps, never against a public repository.",
+    a: "No. For a public GitHub repo, Pich downloads a few files (package.json, package-lock.json, next.config, middleware, and the router file list) and reads them as text. Nothing is installed, built, or run. The before/after proof below was run only on two of our own bundled demo apps.",
   },
   {
     q: "What does “Absent within inspected scope” mean?",
@@ -51,11 +51,11 @@ const FAQ = [
   },
   {
     q: "Which advisories and frameworks are supported?",
-    a: "Next.js apps with an npm lockfile. Two advisories are bundled: CVE-2025-29927 (with a runtime proof) and GHSA-6gpp-xcg3-4w24 (static checks only). Pasted advisories work when their conditions fit Pich's 8 checks; anything else is shown as needing a person.",
+    a: "Public GitHub Next.js apps with an npm package-lock.json (pnpm and yarn lockfiles give Needs manual review). Two advisories are bundled: CVE-2025-29927 (with a runtime proof) and GHSA-6gpp-xcg3-4w24 (static checks only). Pasted advisories work when their conditions fit Pich's 8 checks; anything else is shown as needing a person.",
   },
   {
     q: "Is Pich production-ready?",
-    a: "No. This is a hackathon build that checks bundled demo apps. Connecting real client repositories is the next step, and it is not built yet.",
+    a: "No. This is a hackathon build. It reads public GitHub repos only, one at a time, and knows 8 checks. Private repos, batch checks across all clients, and more lockfile formats are next.",
   },
 ];
 
@@ -132,7 +132,7 @@ export default function Home() {
               href="#try"
               className="rounded border-2 bg-primary px-6 py-3 font-head text-primary-foreground shadow-md transition hover:-translate-y-0.5 hover:shadow-lg"
             >
-              Check 8 demo client apps
+              Check an advisory
             </a>
             <a href="#proof" className="rounded border-2 bg-card px-6 py-3 font-head shadow-md transition hover:-translate-y-0.5 hover:shadow-lg">
               See the runtime proof
@@ -154,10 +154,9 @@ export default function Home() {
           </ol>
         </Section>
 
-        <Section id="try" eyebrow="Product" title="Run Pich on 8 demo client apps">
+        <Section id="try" eyebrow="Product" title="Try Pich">
           <p className="mb-8 max-w-2xl">
-            These are 8 small Next.js apps bundled with Pich, each set up like a real agency client: different versions, hosting, middleware, and build
-            settings.
+            Pick an advisory, then check it against 8 demo client apps or against your own public GitHub repository.
           </p>
           <Workflow />
         </Section>

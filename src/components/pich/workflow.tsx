@@ -14,6 +14,7 @@ type Compiled = { checklist: Checklist; rejected: RejectedItem[]; meta: ServMeta
 type NoteState = { status: "loading" } | { status: "error"; message: string } | { status: "done"; note: ClientNote; meta: ServMeta };
 
 const CUSTOM = "custom";
+const EXAMPLE_REPO = "https://github.com/CryptoZephyr/Pich/tree/devin/1790543127-pich-serv-core/fixtures/client-a";
 
 async function postJson<T>(url: string, body: unknown): Promise<T> {
   const res = await fetch(url, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
@@ -72,14 +73,16 @@ function ConditionRow({ c }: { c: ConditionResult }) {
   );
 }
 
-function ClientCard({ result, checklist }: { result: AppResult; checklist: Checklist }) {
-  const [open, setOpen] = useState(false);
+type ExplainTarget = { clientId: string } | { repoUrl: string };
+
+function ClientCard({ result, checklist, target, defaultOpen = false }: { result: AppResult; checklist: Checklist; target: ExplainTarget; defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
   const [note, setNote] = useState<NoteState | null>(null);
 
   async function writeNote() {
     setNote({ status: "loading" });
     try {
-      const data = await postJson<{ note: ClientNote; meta: ServMeta }>("/api/explain", { checklist, clientId: result.clientId });
+      const data = await postJson<{ note: ClientNote; meta: ServMeta }>("/api/explain", { checklist, ...target });
       setNote({ status: "done", note: data.note, meta: data.meta });
     } catch (err) {
       setNote({ status: "error", message: err instanceof Error ? err.message : "Something went wrong" });
@@ -187,27 +190,45 @@ export function Workflow() {
   const [customText, setCustomText] = useState("");
   const [phase, setPhase] = useState<"idle" | "compiling" | "checking" | "done" | "error">("idle");
   const [error, setError] = useState("");
-  const [compiled, setCompiled] = useState<Compiled | null>(null);
+  const [compiled, setCompiled] = useState<(Compiled & { text: string }) | null>(null);
   const [results, setResults] = useState<AppResult[] | null>(null);
+  const [scope, setScope] = useState<"demo" | "repo">("demo");
+  const [repoUrl, setRepoUrl] = useState("");
+  const [checkedRepo, setCheckedRepo] = useState<{ name: string; url: string } | null>(null);
 
   const advisoryText = selected === CUSTOM ? customText : (CURATED_ADVISORIES.find((a) => a.id === selected)?.text ?? "");
   const busy = phase === "compiling" || phase === "checking";
 
+  const canRun = advisoryText.trim().length >= 40 && (scope === "demo" || repoUrl.trim().length > 0);
+
   async function run() {
     setError("");
-    setCompiled(null);
     setResults(null);
-    setPhase("compiling");
+    setCheckedRepo(null);
     try {
-      const c = await postJson<Compiled>("/api/compile", { advisoryText });
-      setCompiled(c);
+      let c = compiled;
+      if (!c || c.text !== advisoryText) {
+        setCompiled(null);
+        setPhase("compiling");
+        c = { ...(await postJson<Compiled>("/api/compile", { advisoryText })), text: advisoryText };
+        setCompiled(c);
+      }
       if (c.checklist.affected_ranges.length === 0) {
         setPhase("done");
         return;
       }
       setPhase("checking");
-      const r = await postJson<{ results: AppResult[] }>("/api/check", { checklist: c.checklist });
-      setResults(r.results);
+      if (scope === "repo") {
+        const r = await postJson<{ results: AppResult[]; repo: { name: string; url: string } }>("/api/check-repo", {
+          checklist: c.checklist,
+          repoUrl,
+        });
+        setResults(r.results);
+        setCheckedRepo(r.repo);
+      } else {
+        const r = await postJson<{ results: AppResult[] }>("/api/check", { checklist: c.checklist });
+        setResults(r.results);
+      }
       setPhase("done");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Something went wrong");
@@ -261,11 +282,69 @@ export function Workflow() {
             <pre className="mt-2 max-h-72 overflow-auto whitespace-pre-wrap font-mono text-xs">{advisoryText}</pre>
           </details>
         )}
+      </div>
+
+      <div className="space-y-4">
+        <StepTitle n={2}>Choose which apps to check</StepTitle>
+        <div className="grid gap-3 md:grid-cols-2">
+          {(
+            [
+              { id: "demo", title: "8 demo client apps", sub: "Bundled apps set up like real agency clients. Best for a first look." },
+              { id: "repo", title: "My public GitHub repo", sub: "Paste a link. Pich reads a few files through GitHub and never runs code." },
+            ] as const
+          ).map((o) => (
+            <button
+              key={o.id}
+              type="button"
+              onClick={() => setScope(o.id)}
+              aria-pressed={scope === o.id}
+              disabled={busy}
+              className={cn(
+                "cursor-pointer rounded border-2 p-4 text-left shadow-md transition hover:-translate-y-0.5 hover:shadow-lg disabled:cursor-not-allowed",
+                scope === o.id ? "bg-accent" : "bg-card",
+              )}
+            >
+              <span className="block font-head">{o.title}</span>
+              <span className="mt-1 block text-sm">{o.sub}</span>
+            </button>
+          ))}
+        </div>
+        {scope === "repo" && (
+          <div className="space-y-2 rounded border-2 bg-card p-4">
+            <label htmlFor="repo-url" className="block font-medium">
+              Public GitHub repository link
+            </label>
+            <input
+              id="repo-url"
+              type="url"
+              value={repoUrl}
+              onChange={(e) => setRepoUrl(e.target.value)}
+              placeholder="https://github.com/owner/repo"
+              className="w-full rounded border-2 bg-input px-3 py-2 font-mono text-sm shadow-md outline-none focus:shadow-xs"
+            />
+            <p className="text-sm text-muted-foreground">
+              For a monorepo, link to the app folder, e.g. <code className="font-mono">…/tree/main/apps/web</code>. Try{" "}
+              <button type="button" className="cursor-pointer underline" onClick={() => setRepoUrl(EXAMPLE_REPO)}>
+                an example
+              </button>
+              . Pich reads package.json, package-lock.json, next.config, middleware and the router folders. Hosting is unknown unless the
+              repo has a <code className="font-mono">pich.deploy.json</code>.
+            </p>
+          </div>
+        )}
         <div className="flex flex-wrap items-center gap-4">
-          <Button size="lg" onClick={run} disabled={busy || advisoryText.trim().length < 40}>
-            {phase === "compiling" ? "SERV is reading the advisory…" : phase === "checking" ? "Checking 8 client apps…" : "Check my client apps"}
+          <Button size="lg" onClick={run} disabled={busy || !canRun}>
+            {phase === "compiling"
+              ? "SERV is reading the advisory…"
+              : phase === "checking"
+                ? scope === "repo"
+                  ? "Reading the repo…"
+                  : "Checking 8 demo apps…"
+                : scope === "repo"
+                  ? "Check this repo"
+                  : "Check the 8 demo apps"}
           </Button>
-          <span className="text-sm text-muted-foreground">Checks 8 bundled demo client apps. No repository code is run.</span>
+          <span className="text-sm text-muted-foreground">No repository code is ever run.</span>
         </div>
         {phase === "compiling" && (
           <p className="text-sm" role="status">
@@ -281,7 +360,7 @@ export function Workflow() {
 
       {compiled && (
         <div className="space-y-4">
-          <StepTitle n={2}>SERV turned the advisory into a checklist</StepTitle>
+          <StepTitle n={3}>What SERV read from the advisory</StepTitle>
           <div className="rounded border-2 bg-card p-4 shadow-md">
             <p className="font-head">{compiled.checklist.title}</p>
             <p className="text-xs text-muted-foreground">
@@ -358,13 +437,13 @@ export function Workflow() {
 
       {phase === "checking" && (
         <p className="text-sm" role="status">
-          Checking each client app&apos;s files against the checklist…
+          {scope === "repo" ? "Reading the repository files from GitHub…" : "Checking each demo app's files against the checklist…"}
         </p>
       )}
 
       {results && compiled && counts && (
         <div className="space-y-4">
-          <StepTitle n={3}>Verdict for each client app</StepTitle>
+          <StepTitle n={4}>{checkedRepo ? "Verdict for your repo" : "Verdict for each demo app"}</StepTitle>
           <p className="text-sm">
             {(Object.keys(counts) as Verdict[]).map((v, i) => (
               <span key={v}>
@@ -372,11 +451,27 @@ export function Workflow() {
                 <strong>{counts[v]}</strong> {VERDICT_LABEL[v]}
               </span>
             ))}
-            . Open an app to see the code evidence, unknowns, and a client note.
+            . {checkedRepo ? (
+              <>
+                Checked{" "}
+                <a href={checkedRepo.url} className="underline" target="_blank" rel="noreferrer">
+                  {checkedRepo.name}
+                </a>
+                .
+              </>
+            ) : (
+              "Open an app to see the code evidence, unknowns, and a client note."
+            )}
           </p>
           <ul className="space-y-3">
             {results.map((r) => (
-              <ClientCard key={`${compiled.meta.id}-${r.clientId}`} result={r} checklist={compiled.checklist} />
+              <ClientCard
+                key={`${compiled.meta.id}-${checkedRepo?.url ?? ""}-${r.clientId}`}
+                result={r}
+                checklist={compiled.checklist}
+                target={checkedRepo ? { repoUrl: checkedRepo.url } : { clientId: r.clientId }}
+                defaultOpen={Boolean(checkedRepo)}
+              />
             ))}
           </ul>
         </div>

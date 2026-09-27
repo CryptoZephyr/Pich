@@ -96,11 +96,15 @@ export function installedNextVersion(files: RepoFiles): { version?: string; evid
     };
   }
   const pkg = readJson(files, "package.json");
-  const declared = (pkg?.dependencies as Record<string, string> | undefined)?.next;
+  const declared =
+    (pkg?.dependencies as Record<string, string> | undefined)?.next ?? (pkg?.devDependencies as Record<string, string> | undefined)?.next;
+  const otherLock = ["pnpm-lock.yaml", "yarn.lock", "bun.lock", "bun.lockb"].find((f) => f in files);
   return {
     evidence: declared ? lineEvidence(files, "package.json", /"next":/) : [],
     note: declared
-      ? `No lockfile; package.json declares next "${declared}", so the installed version is not determinable`
+      ? otherLock
+        ? `Pich reads only npm's package-lock.json; this repo uses ${otherLock}, and package.json declares next "${declared}", so the installed version is not determined`
+        : `No lockfile; package.json declares next "${declared}", so the installed version is not determinable`
       : "next is not a dependency of this repository",
   };
 }
