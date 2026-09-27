@@ -341,7 +341,7 @@ export function Workflow() {
               <span className="font-medium">Quote check:</span>{" "}
               {compiled.rejected.length === 0
                 ? "every item above quotes the advisory word for word."
-                : `${compiled.rejected.length} item(s) were thrown out because their quote was not word for word in the advisory:`}
+                : `${compiled.rejected.length} item(s) were corrected or thrown out by Pich's checks:`}
               {compiled.rejected.length > 0 && (
                 <ul className="mt-1 list-disc pl-5">
                   {compiled.rejected.map((r, i) => (

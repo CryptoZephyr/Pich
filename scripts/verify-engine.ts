@@ -102,6 +102,20 @@ function run() {
   assert.equal(cleaned.predicates.length, 3);
   assert.equal(cleaned.affected_ranges.length, 4);
   console.log("ok fabricated range and predicate rejected");
+
+  const flipped: Checklist = {
+    ...CVE_29927,
+    predicates: CVE_29927.predicates.map((p) =>
+      p.id === "deployment_on_vercel" ? { ...p, expected: "present" as const } : p,
+    ),
+  };
+  const corrected = validateChecklist(flipped, cve29927.text);
+  assert.equal(
+    corrected.checklist.predicates.find((p) => p.id === "deployment_on_vercel")?.expected,
+    "absent",
+    "protective quote must force expected=absent",
+  );
+  console.log("ok reversed protective predicate corrected");
 }
 
 if (process.argv[1]?.endsWith("verify-engine.ts")) run();

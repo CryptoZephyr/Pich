@@ -126,6 +126,8 @@ export function quoteIsVerbatim(quoteText: string, advisoryText: string): boolea
   return q.length >= 8 && normalizeForQuote(advisoryText).includes(q);
 }
 
+const PROTECTIVE_QUOTE = /\b(protected|not affected|unaffected|not vulnerable|not impacted)\b/i;
+
 export function validateChecklist(raw: Checklist, advisoryText: string): ValidatedChecklist {
   const rejected: RejectedItem[] = [];
   const allowed = new Set<string>(PREDICATE_IDS);
@@ -143,7 +145,16 @@ export function validateChecklist(raw: Checklist, advisoryText: string): Validat
   });
 
   const seen = new Set<string>();
-  const predicates = raw.predicates.filter((p) => {
+  const predicates = raw.predicates.map((p) => {
+    if (p.expected === "present" && PROTECTIVE_QUOTE.test(p.source_quote)) {
+      rejected.push({
+        item: `predicate "${p.id}"`,
+        reason: "quote says this condition protects apps, so it was corrected from present to absent",
+      });
+      return { ...p, expected: "absent" as const };
+    }
+    return p;
+  }).filter((p) => {
     if (!allowed.has(p.id)) {
       rejected.push({ item: `predicate "${p.id}"`, reason: "not in Pich's predicate vocabulary" });
       return false;

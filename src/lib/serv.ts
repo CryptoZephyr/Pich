@@ -55,8 +55,10 @@ Rules:
 3. Every source_quote must be copied character-for-character from the advisory text, a short contiguous span (under 200 characters). Never paraphrase inside source_quote. Items whose quote is not verbatim are discarded.
 4. unexpressible_conditions: properties of the application or its deployment, stated in the advisory, that the vocabulary cannot express. kind="required_condition" if it must hold for the app to be exposed; kind="mitigation" if it is a workaround, patch alternative, or upstream protection that would reduce exposure (e.g. filtering a header, moving authorization elsewhere).
    Do NOT list the attacker's actions (sending crafted requests, setting a header) as conditions: the attack itself is assumed. Do NOT restate a condition already covered by a predicate or by affected_ranges.
-5. Do not invent conditions that the advisory does not state. If the advisory is not about next, return empty affected_ranges and predicates and explain in recommended_response.
-6. deployment_assumptions and required_evidence: short plain-English strings. recommended_response: one or two sentences, citing fixed versions.`;
+   If a condition can be expressed with a vocabulary predicate (e.g. "the authorization check occurs in middleware" is middleware_enforces_auth=present), you MUST use the predicate and must NOT also list it here.
+5. Polarity: a hosting platform or configuration that the advisory says is protected or not affected is a predicate with expected="absent" (e.g. "hosted on Vercel are automatically protected" means deployment_on_vercel=absent).
+6. Do not invent conditions that the advisory does not state. If the advisory is not about next, return empty affected_ranges and predicates and explain in recommended_response.
+7. deployment_assumptions and required_evidence: short plain-English strings. recommended_response: one or two sentences, citing fixed versions.`;
 
 export async function compileAdvisory(advisoryText: string): Promise<{ checklist: Checklist; meta: ServMeta }> {
   const started = Date.now();
