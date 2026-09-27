@@ -12,6 +12,7 @@ const NAV = [
   { href: "#how", label: "How it works" },
   { href: "#proof", label: "Proof" },
   { href: "#faq", label: "FAQ" },
+  { href: "/docs", label: "Docs" },
 ];
 
 const STEPS = [

@@ -4,7 +4,7 @@
 
 **A new Next.js security advisory lands. Pich tells an agency which of its client apps are actually affected, with the lines of code to prove it.**
 
-**Live demo:** https://pich-dev.vercel.app · **Built with:** OpenServ SERV Reasoning · Next.js · Vercel · **License:** MIT
+**Live demo:** https://pich-dev.vercel.app · **Docs:** https://pich-dev.vercel.app/docs · **Built with:** OpenServ SERV Reasoning · Next.js · Vercel · **License:** MIT
 
 ![Pich landing page](docs/screenshots/hero.png)
 
