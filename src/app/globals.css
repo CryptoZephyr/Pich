@@ -1,26 +1,83 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  --font-head: var(--font-head);
+  --font-sans: var(--font-sans);
+  --font-body: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --radius: 6px;
 
-@theme inline {
+  --shadow-xs: 1px 1px 0 0 var(--border);
+  --shadow-sm: 2px 2px 0 0 var(--border);
+  --shadow: 3px 3px 0 0 var(--border);
+  --shadow-md: 4px 4px 0 0 var(--border);
+  --shadow-lg: 6px 6px 0 0 var(--border);
+  --shadow-xl: 10px 10px 0 1px var(--border);
+
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary-hover: var(--secondary-hover);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+
+  --color-confirmed: #b5473a;
+  --color-confirmed-soft: #f6dcd7;
+  --color-absent: #3f7d4e;
+  --color-absent-soft: #dcecdf;
+  --color-review: #ffce6b;
+  --color-review-soft: #fff1cf;
+  --color-unknown: #6b6b6b;
+  --color-unknown-soft: #ebe8e1;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+:root {
+  --background: #fbf7ee;
+  --foreground: #141414;
+  --card: #fffdf8;
+  --card-foreground: #141414;
+  --primary: #4b3fcf;
+  --primary-hover: #3f34b8;
+  --primary-foreground: #ffffff;
+  --secondary: #141414;
+  --secondary-hover: #2a2a2a;
+  --secondary-foreground: #fbf7ee;
+  --muted: #efe9dc;
+  --muted-foreground: #4f4a42;
+  --accent: #ffce6b;
+  --accent-foreground: #141414;
+  --destructive: #b5473a;
+  --destructive-foreground: #ffffff;
+  --border: #141414;
+  --input: #fffdf8;
+}
+
+* {
+  border-color: var(--border);
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), system-ui, sans-serif;
+}
+
+h1, h2, h3 {
+  font-family: var(--font-head), system-ui, sans-serif;
 }
