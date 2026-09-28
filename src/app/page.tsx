@@ -223,7 +223,7 @@ export default function Home() {
           </p>
         </Section>
 
-        <Section id="faq" eyebrow="FAQ" title="Questions agencies and judges ask">
+        <Section id="faq" eyebrow="FAQ" title="What Pich does and doesn’t claim">
           <Accordion>
             {FAQ.map((f) => (
               <AccordionItem key={f.q} value={f.q}>
